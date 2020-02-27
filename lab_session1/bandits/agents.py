@@ -9,6 +9,7 @@ An example can be seen on the Bandit_Agent and Random_Agent classes.
 import numpy as np
 from utils import softmax, my_random_choice
 
+
 class Bandit_Agent(object):
     """
     Abstract Agent to solve a Bandit problem.
@@ -18,7 +19,8 @@ class Bandit_Agent(object):
     The minimum requirment to instantiate a child class of Bandit_Agent
     is that it implements the act() method (see Random_Agent).
     """
-    def __init__(self, k:int, **kwargs):
+
+    def __init__(self, k: int, **kwargs):
         """
         Simply stores the number of arms of the Bandit problem.
         The __init__() method handles hyperparameters.
@@ -40,7 +42,7 @@ class Bandit_Agent(object):
         """
         pass
 
-    def learn(self, a:int, r:float):
+    def learn(self, a: int, r: float):
         """
         Learning method. The agent learns that action a yielded reward r.
         Parameters
@@ -60,13 +62,16 @@ class Bandit_Agent(object):
         a : positive int < k
             The action the agent chose to perform.
         """
-        raise NotImplementedError("Calling method act() in Abstract class Bandit_Agent")
+        raise NotImplementedError(
+            "Calling method act() in Abstract class Bandit_Agent")
+
 
 class Random_Agent(Bandit_Agent):
     """
     This agent doesn't learn, just acts purely randomly.
     Good baseline to compare to other agents.
     """
+
     def act(self):
         """
         Random action selection.
@@ -78,32 +83,117 @@ class Random_Agent(Bandit_Agent):
         return np.random.randint(self.k)
 
 
-class EpsGreedy_SampleAverage:
+class EpsGreedy_SampleAverage(Bandit_Agent):
     # TODO: implement this class following the formalism above.
     # This class uses Sample Averages to estimate q; others are non stationary.
-    pass
+
+    def __init__(self, eps: float, **kwargs):
+        super().__init__(**kwargs)
+        self.q = np.zeros(self.k)
+        self.eps = float(eps)
+        self.steps = np.zeros(self.k)
+
+    def reset(self):
+        self.q = np.zeros(self.k)
+        self.steps = np.zeros(self.k)
+
+    def learn(self, a: int, r: float):
+        self.q[a] += (r - self.q[a]) / self.steps[a]
+
+    def act(self) -> int:
+        if np.random.random() > self.eps:
+            # Select best option
+            act = max(enumerate(self.q), key=lambda q: q[1])[0]
+        else:
+            # Select random
+            act = np.random.randint(self.k)
+        self.steps[act] += 1
+        return act
 
 
-class EpsGreedy:
+class EpsGreedy(EpsGreedy_SampleAverage):
     # TODO: implement this class following the formalism above.
     # Non stationary agent with q estimating and eps-greedy action selection.
-    pass
+
+    def __init__(self, alpha: float, **kwargs):
+        super().__init__(**kwargs)
+        self.alpha = float(alpha)
+
+    def learn(self, a: int, r: float):
+        self.q[a] = self.q[a] + self.alpha * (r - self.q[a])
 
 
-class OptimisticGreedy:
+class OptimisticGreedy(Bandit_Agent):
     # TODO: implement this class following the formalism above.
     # Same as above but with optimistic starting values.
-    pass
+
+    def __init__(self, q0: float, alpha: float, **kwargs):
+        super().__init__(**kwargs)
+        self.q0 = q0
+        self.q = np.full(self.k, self.q0)
+        self.alpha = alpha
+
+    def reset(self):
+        self.q = np.full(self.k, self.q0)
+
+    def learn(self, a: int, r: float):
+        self.q[a] = self.q[a] + self.alpha * (r - self.q[a])
+
+    def act(self) -> int:
+        return max(enumerate(self.q), key=lambda q: q[1])[0]
 
 
-class UCB:
+class UCB(EpsGreedy):
     # TODO: implement this class following the formalism above.
-    pass
+
+    def __init__(self, c: float, **kwargs):
+        super().__init__(**kwargs)
+        self.c = c
+
+    def act(self) -> int:
+        if np.sum(self.steps) < self.k:
+            act = int(np.sum(self.steps))
+        else:
+            act = max([(act, self.q[act] + self.c * np.sqrt(
+                np.log(np.sum(self.steps)) / self.steps[act]))
+                       for act in range(self.k)], key=lambda x: x[1])[0]
+        self.steps[act] += 1
+        return act
 
 
-class Gradient_Bandit:
+class Gradient_Bandit(Bandit_Agent):
     # TODO: implement this class following the formalism above.
     # If you want this to run fast, use the my_random_choice function from
     # utils instead of np.random.choice to sample from the softmax
     # You can also find the softmax function in utils.
-    pass
+
+    def __init__(self, alpha: float, **kwargs):
+        super().__init__(**kwargs)
+        self.h = np.zeros(self.k)
+        self.alpha = alpha
+        self.r = 0
+        self.steps = 0
+
+    def reset(self):
+        self.steps = 0
+        self.r = 0
+        self.h = np.zeros(self.k)
+
+    def learn(self, a: int, r: float):
+        self.r += (r - self.r) / self.steps
+
+        pi = softmax(self.h)
+
+        self.h[a] += self.alpha * (r - self.r) * (1 - pi[a])
+
+        for i in range(self.k):
+            if i != a:
+                self.h[i] -= self.alpha * (r - self.r) * pi[i]
+
+    def act(self) -> int:
+        self.steps += 1
+
+        # Generate probability distribution
+        pi = softmax(self.h)
+
+        return my_random_choice(self.k, pi)

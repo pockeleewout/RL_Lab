@@ -5,8 +5,10 @@ You do not need to do anything here; but you're free to read up how things work!
 """
 import numpy as np
 import matplotlib
+
 matplotlib.use('agg')
 import matplotlib.pyplot as plt
+
 
 def softmax(x):
     """
@@ -27,6 +29,7 @@ def softmax(x):
     """
     e_x = np.exp(x - np.max(x))
     return e_x / e_x.sum()
+
 
 def my_random_choice(v, p=None):
     """
@@ -54,7 +57,9 @@ def my_random_choice(v, p=None):
     if p is None:
         return v[np.random.randint(len(v))]
     # else (general case)
-    assert (abs(sum(p)-1.)<1e-6), "Invalid probability vector p, sum={}".format(sum(p))
+    assert (abs(
+        sum(p) - 1.) < 1e-6), "Invalid probability vector p, sum={}".format(
+        sum(p))
     r = np.random.rand()
     i = 0
     s = p[i]
@@ -63,10 +68,13 @@ def my_random_choice(v, p=None):
         s += p[i]
 
     if type(v) is int:
-        assert len(p) == v, "Int doesn't match proba length: {} != {}".format(v, len(p))
+        assert len(p) == v, "Int doesn't match proba length: {} != {}".format(v,
+                                                                              len(
+                                                                                  p))
         return i
     else:
-        assert len(v) == len(p), "Incorrect entry lengths v,p: {} != {}".format(len(v), len(p))
+        assert len(v) == len(p), "Incorrect entry lengths v,p: {} != {}".format(
+            len(v), len(p))
         return v[i]
 
 
@@ -87,27 +95,32 @@ def save_plot(l, file_name, suptitle, title, xlabel, ylabel,
 
     if interval_yaxis is not None:
         new_y1, new_y2 = interval_yaxis
-        x1,x2,y1,y2 = plt.axis()
-        plt.axis((x1,x2,new_y1,new_y2))
+        x1, x2, y1, y2 = plt.axis()
+        plt.axis((x1, x2, new_y1, new_y2))
 
     file_name += '.png'
     plt.savefig(file_name)
     print("Saved figure to", file_name)
     plt.close()
 
+
 def action_plot(l, file_name, suptitle, title, labels=None):
     """ Specific call of save_plot in the case of action proportions
     in bandit problems. """
-    save_plot(l, file_name, suptitle, title, 'Steps', 'Best action proportion', labels, interval_yaxis=[0,1])
+    save_plot(l, file_name, suptitle, title, 'Steps', 'Best action proportion',
+              labels, interval_yaxis=[0, 1])
+
 
 def perf_plot(l, file_name, suptitle, title, labels=None):
     """ Specific call of save_plot in the case of average reward over time
     in bandit problems. """
-    save_plot(l, file_name, suptitle, title, 'Steps', 'Average Reward', labels, interval_yaxis=None)
+    save_plot(l, file_name, suptitle, title, 'Steps', 'Average Reward', labels,
+              interval_yaxis=None)
+
 
 def dict_string(d):
     """ Turns a dictionary d to a single readable string (for plot title)"""
     s = ""
     for key, value in d.items():
         s += "{}:{}, ".format(key, value)
-    return s[:-2] # erase final comma and space
+    return s[:-2]  # erase final comma and space

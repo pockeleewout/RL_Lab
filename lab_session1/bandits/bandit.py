@@ -6,6 +6,8 @@ We expect all classes to follow the Bandit abstract object formalism.
 """
 # -*- coding: utf-8 -*-
 import numpy as np
+import typing
+
 
 class Bandit(object):
     """
@@ -14,6 +16,7 @@ class Bandit(object):
     A Bandit is a distribution over reals.
     The pull() method samples from the distribution to give out a reward.
     """
+
     def __init__(self, **kwargs):
         """
         Empty for our simple one-armed bandits, without hyperparameters.
@@ -34,57 +37,64 @@ class Bandit(object):
         """
         Returns a sample from the distribution.
         """
-        raise NotImplementedError("Calling method pull() in Abstract class Bandit")
+        raise NotImplementedError(
+            "Calling method pull() in Abstract class Bandit")
 
 
-class Gaussian_Bandit:
+class Gaussian_Bandit(Bandit):
     # TODO: implement this class following the formalism above.
     # Reminder: the Gaussian_Bandit's distribution is a fixed Gaussian.
-    pass
 
-class Gaussian_Bandit_NonStat:
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._mean = 0
+        self.reset()
+
+    def reset(self):
+        self._mean = np.random.normal(loc=0, scale=1)
+
+    def pull(self) -> float:
+        return np.random.normal(loc=self._mean, scale=1)
+
+
+class Gaussian_Bandit_NonStat(Bandit):
     # TODO: implement this class following the formalism above.
     # Reminder: the distribution mean changes each step over time,
     # with increments following N(m=0,std=0.01)
-    pass
-
-class KBandit(Bandit):
-    """ Set of k Gaussian_Bandits. """
-    def __init__(self, k, **kwargs):
-        """
-        Instantiates the k-armed bandit, with a number of arms, and initializes
-        the set of bandits to new gaussian bandits in a bandits list.
-        The reset() method is supposedly called from outside.
-        Parameters
-        ----------
-        k: positive int
-            Number of arms of the problem.
-        """
-        self.k = k
-        self.bandits = [Gaussian_Bandit() for _ in range(self.k)]
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._mean = 0
+        self.reset()
 
     def reset(self):
-        """ Resets each of the k bandits. """
-        for bandit in self.bandits:
-            bandit.reset()
-        self.best_action = np.argmax([bandit.mean for bandit in self.bandits]) # printing purposes
+        self._mean = np.random.normal(loc=0, scale=1)
 
-    def pull(self, action:int) -> float:
-        """
-        Pulls the lever from Bandit #action. Returns the reward.
-        Parameters
-        ----------
-        action: positive int < k
-            Lever to pull.
-        Returns
-        -------
-        reward : float
-            Reward for pulling this lever.
-        """
-        return self.bandits[action].pull()
+    def pull(self) -> float:
+        mean = self._mean
+        self._mean += np.random.normal(loc=0, scale=0.01)
+        return np.random.normal(loc=mean, scale=1)
 
 
-class KBandit_NonStat:
-    # TODO: implement this class following the formalism above.
-    # Reminder: Same as KBandit, with non stationary Bandits.
-    pass
+def kbandit(bandit_class: typing.ClassVar):
+    class KBandit(Bandit):
+        # TODO: implement this class following the formalism above.
+
+        def __init__(self, k: int = 1, **kwargs):
+            super().__init__(**kwargs)
+            self._bandits = [bandit_class() for _ in range(k)]
+            self.reset()
+
+        def reset(self):
+            for bandit in self._bandits:
+                bandit.reset()
+
+        def pull(self, i: int = 0) -> float:
+            return self._bandits[i].pull()
+
+    return KBandit
+
+
+KBandit = kbandit(Gaussian_Bandit)
+
+
+KBandit_NonStat = kbandit(Gaussian_Bandit_NonStat)

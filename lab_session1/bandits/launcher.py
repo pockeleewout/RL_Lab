@@ -9,9 +9,11 @@ from utils import *
 from agents import *
 from bandit import *
 
-## FUNCTIONS ===================================================================
 
-def run_bandit(agent, kbandit, max_steps) -> (np.array, np.array):
+# FUNCTIONS ===================================================================
+
+def run_bandit(agent: Bandit_Agent, kbandit: KBandit, max_steps: int) -> (
+        np.array, np.array):
     """
     Runs a Bandit problem once. The kbandit and agent are reinitializated,
     then for max_steps, we run the bandit-agent interactions with learning.
@@ -35,7 +37,30 @@ def run_bandit(agent, kbandit, max_steps) -> (np.array, np.array):
                 of ones and zeros rather than actual booleans.
     """
     # TODO: implement this function.
+    perf = np.full(max_steps, -np.inf)
+    best_action = np.full(max_steps, False, dtype=np.bool)
+
+    # Reset agent and bandit
+    agent.reset()
+    kbandit.reset()
+
+    for step in range(max_steps):
+
+        # Get the index of the best bandit
+        max_index = max(enumerate(kbandit._bandits),
+                        key=lambda bandit: bandit[1]._mean)[0]
+        act = agent.act()
+
+        # Save best_action
+        best_action[step] = max_index == act
+        # Save performance
+        perf[step] = kbandit.pull(act)
+
+        # Let the agent learn
+        agent.learn(act, perf[step])
+
     return perf, best_action
+
 
 def run_multiple_bandits(n_runs, **kwargs) -> (np.array, np.array):
     """
@@ -59,7 +84,8 @@ def run_multiple_bandits(n_runs, **kwargs) -> (np.array, np.array):
         perfs.append(perf)
         best_actions.append(best_action)
 
-    return np.mean(perfs,axis=0), np.mean(best_actions,axis=0)
+    return np.mean(perfs, axis=0), np.mean(best_actions, axis=0)
+
 
 def run_multiple_agents(agents, **kwargs):
     """
@@ -87,6 +113,7 @@ def run_multiple_agents(agents, **kwargs):
         best_actions.append(best_action)
 
     return perfs, best_actions
+
 
 def run_spectrum(spectrum, **kwargs):
     """
@@ -121,7 +148,8 @@ def run_spectrum(spectrum, **kwargs):
 
     return np.array(perfs), np.array(best_actions)
 
-## HYPERPARAMETERS =============================================================
+
+# HYPERPARAMETERS =============================================================
 config = {
     'k': 10,
     'lr': 0.1,
@@ -134,12 +162,12 @@ config = {
 n_runs = 2000
 max_steps = 1000
 
-## RUNNING =====================================================================
+# RUNNING =====================================================================
 kbandit = KBandit(**config)
 
 # Un-comment the one you want to use.
 launch_type = 'multiple_agents'
-#launch_type = 'spectrum'
+# launch_type = 'spectrum'
 
 if launch_type == 'multiple_agents':
     agents = [
@@ -150,25 +178,29 @@ if launch_type == 'multiple_agents':
         Gradient_Bandit(**config),
         UCB(**config)
     ]
-    perfs, best_actions = run_multiple_agents(agents, kbandit=kbandit, n_runs=n_runs, max_steps=max_steps)
+    perfs, best_actions = run_multiple_agents(agents, kbandit=kbandit,
+                                              n_runs=n_runs,
+                                              max_steps=max_steps)
     # You can change the labels, title and file_name
-    labels = ['Random', 'EpsGreedy', 'EpsGreedySA', 'Optimistic', 'Gradient', 'UCB']
+    labels = ['Random', 'EpsGreedy', 'EpsGreedySA', 'Optimistic', 'Gradient',
+              'UCB']
     file_name = 'plots/agent_comparison'
     suptitle = 'Agent comparison on k-armed-Bandit'
 
 elif launch_type == 'spectrum':
     agent = UCB(**config)
-    spectrum =  ['c', [0.25,0.5,1,2]]
+    spectrum = ['c', [0.25, 0.5, 1, 2]]
     # finally, running:
-    perfs, best_actions = run_spectrum(spectrum, agent=agent, kbandit=kbandit, n_runs=n_runs, max_steps=max_steps
+    perfs, best_actions = run_spectrum(spectrum, agent=agent, kbandit=kbandit,
+                                       n_runs=n_runs, max_steps=max_steps)
     # You can change the labels, title and file_name
     labels = ['{}={}'.format(spectrum[0], value) for value in spectrum[1]]
     file_name = 'plots/{}_study'.format(spectrum[0])
-    suptitle = 'Varying {} for {} on k-armed-Bandit'.format(spectrum[0], agent.__class__.__name__)
+    suptitle = 'Varying {} for {} on k-armed-Bandit'.format(spectrum[0],
+                                                            agent.__class__.__name__)
 
-
-## PLOTTING ====================================================================
+# PLOTTING ====================================================================
 title = dict_string(config)
 
-action_plot (best_actions, file_name+'_action', suptitle, title, labels)
-perf_plot   (perfs, file_name+'_perf', suptitle, title, labels)
+action_plot(best_actions, file_name + '_action', suptitle, title, labels)
+perf_plot(perfs, file_name + '_perf', suptitle, title, labels)

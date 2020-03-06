@@ -8,7 +8,7 @@ for _ in range(1000):
     new_state, reward, done, info = env.step(env.action_space.sample())
     if done:
         env.reset()
-print("number of actions possible are :-",env.action_space.n)
+print("number of actions possible are :-", env.action_space.n)
 
 env.close()
 
@@ -19,5 +19,5 @@ for _ in range(500):
     new_state, reward, done, info = env.step(env.action_space.sample())
     if done:
         env.reset()
-print("number of actions possible are :-",env.action_space.n)
+print("number of actions possible are :-", env.action_space.n)
 env.close()

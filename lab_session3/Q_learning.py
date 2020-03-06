@@ -8,7 +8,7 @@ from gym.envs.registration import register
 # 4x4 environment
 kwargs = {'map_name': '4x4', 'is_slippery': False}
 # 8x8 environment
-# kwargs = {'map_name': '8x8', 'is_slippery': True}
+kwargs = {'map_name': '8x8', 'is_slippery': True}
 register(
     id='FrozenLakeNotSlippery-v0',
     entry_point='gym.envs.toy_text:FrozenLakeEnv',
@@ -46,13 +46,13 @@ class Agent(object):
         """
         self.qtable = qtable
         self.learning_rate = 0.1  # Learning rate
-        self.gamma = 0.95  # Discounting rate
+        self.gamma = 0.97  # Discounting rate
 
         # Exploration parameters
         self.epsilon = 1.0  # Exploration rate
         self.max_epsilon = 1.0  # Exploration probability at start
         self.min_epsilon = 0.01  # Minimum exploration probability
-        self.decay_rate = 0.001  # Exponential decay rate for exploration prob
+        self.decay_rate = 0.000001  # Exponential decay rate for exploration prob
 
     def act(self, state, exp_exp_tradeoff):
         """
@@ -78,7 +78,7 @@ class Agent(object):
             return np.random.randint(action_size)
         else:
             # Return optimal
-            return max(enumerate(self.qtable[state].tolist()), key=lambda x: x[1])[0]
+            return np.argmax(self.qtable[state])
 
     def learn(self, state, action, reward, new_state):
         """
@@ -138,7 +138,7 @@ class Trainer(object):
         """
         # config of your run.
         self.total_episodes = 20000  # Total episodes
-        self.max_steps = 99  # Max steps per episode
+        self.max_steps = 2000  # Max steps per episode
 
         # q-table
         self.qtable = qtable

@@ -46,7 +46,7 @@ class Agent(object):
         """
         self.qtable = qtable
         self.learning_rate = 0.1  # Learning rate
-        self.gamma = 0.97  # Discounting rate
+        self.gamma = 0.985  # Discounting rate
 
         # Exploration parameters
         self.epsilon = 1.0  # Exploration rate
@@ -71,9 +71,9 @@ class Agent(object):
 
         """
         # TODO Write code to check if your agent wants to explore or exploit
-        if exp_exp_tradeoff < self.epsilon:
+        if np.random.rand() < self.epsilon:
             # Return random with chance epsilon
-            return np.random.randint(action_size)
+            return np.random.randint(4)
         else:
             # Return optimal
             return np.argmax(self.qtable[state])
@@ -136,7 +136,7 @@ class Trainer(object):
         """
         # config of your run.
         self.total_episodes = 20000  # Total episodes
-        self.max_steps = 2000  # Max steps per episode
+        self.max_steps = 99  # Max steps per episode
 
         # q-table
         self.qtable = qtable
@@ -163,10 +163,8 @@ class Trainer(object):
 
             # Number of steps in each episode
             for step in range(self.max_steps):
-                exp_exp_tradeoff = random.uniform(0, 1)
-
                 # take an action
-                action = self.agent.act(state, exp_exp_tradeoff)
+                action = self.agent.act(state)
 
                 # get feedback from environment
                 new_state, reward, done, info = env.step(action)
@@ -194,39 +192,39 @@ class Trainer(object):
             rewards.append(self.total_rewards)
 
         # print your scores
-        print("Score over time: " + str(sum(rewards) / self.total_episodes))
+        # print("Score over time: " + str(sum(rewards) / self.total_episodes))
 
         # print the qtable
-        print(self.agent.qtable)
+        # print(self.agent.qtable)
 
         # printing epsilon
-        print(self.agent.epsilon)
+        # print(self.agent.epsilon)
 
         return self.qtable
 
 
 def test():
     """Function to test your agent."""
-    for episode in range(5):
+    for episode in range(100):
         state = env.reset()
-        print(type(state))
+        # print(type(state))
         step = 0
         done = False
         print("*****************************")
         print("EPISODE ", episode)
         for step in range(99):
-            env.render()
+            # env.render()
             # Take the action (index) that have the maximum expected future reward given that state
             action = np.argmax(qtable[state, :])
-            print(action)
+            # print(action)
             new_state, reward, done, info = env.step(action)
-            print(reward)
+            # print(reward)
             if done:
                 if reward == 1:
                     print('\n \x1b[6;30;42m' + 'Success!' + '\x1b[0m')
                 action = np.argmax(qtable[state, :])
-                print(action)
-                env.render()
+                # print(action)
+                # env.render()
                 break
             state = new_state
     env.close()
@@ -241,9 +239,9 @@ if __name__ == '__main__':
 
     # reset environment and test
     env.reset()
-    env.render()
-    if kwargs['map_name'] == '4x4':
-        print(np.argmax(qtable, axis=1).reshape(4, 4))
-    elif kwargs['map_name'] == '8x8':
-        print(np.argmax(qtable, axis=1).reshape(8, 8))
+    # env.render()
+    # if kwargs['map_name'] == '4x4':
+    #     print(np.argmax(qtable, axis=1).reshape(4, 4))
+    # elif kwargs['map_name'] == '8x8':
+    #     print(np.argmax(qtable, axis=1).reshape(8, 8))
     test()

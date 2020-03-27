@@ -4,6 +4,24 @@ import random
 
 from gym.envs.registration import register
 
+def allmax(a):
+    """ Returns all occurences of the max """
+    if len(a) == 0:
+        return []
+    all_ = [0]
+    max_ = a[0]
+    for i in range(1, len(a)):
+        if a[i] > max_:
+            all_ = [i]
+            max_ = a[i]
+        elif a[i] == max_:
+            all_.append(i)
+    return all_
+
+def my_argmax(v):
+    """ Breaks ties randomly. """
+    return random.choice(allmax(v))
+
 # code to set a gym config
 # 4x4 environment
 kwargs = {'map_name': '4x4', 'is_slippery': False}
@@ -70,13 +88,10 @@ class Agent(object):
             action to take
 
         """
-        # TODO Write code to check if your agent wants to explore or exploit
         if np.random.rand() < self.epsilon:
-            # Return random with chance epsilon
-            return np.random.randint(4)
+            return np.random.randint(action_size)
         else:
-            # Return optimal
-            return np.argmax(self.qtable[state])
+            return my_argmax(self.qtable[state])
 
     def learn(self, state, action, reward, new_state):
         """

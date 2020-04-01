@@ -154,10 +154,9 @@ class UCB(EpsGreedy):
         if np.sum(self.steps) < self.k:
             act = int(np.sum(self.steps))
         else:
-            act = max([
-                (act, self.q[act] + self.c * np.sqrt(
-                    np.log(np.sum(self.steps)) / self.steps[act])
-                 ) for act in range(self.k)], key=lambda x: x[1])[0]
+            act = max([(act, self.q[act] + self.c * np.sqrt(
+                np.log(np.sum(self.steps)) / self.steps[act]))
+                       for act in range(self.k)], key=lambda x: x[1])[0]
         self.steps[act] += 1
         return act
 

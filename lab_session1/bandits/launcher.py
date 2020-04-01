@@ -160,7 +160,7 @@ config = {
 }
 
 n_runs = 2000
-max_steps = 10000
+max_steps = 1000
 
 # RUNNING =====================================================================
 kbandit = KBandit(**config)
@@ -171,18 +171,19 @@ launch_type = 'multiple_agents'
 
 if launch_type == 'multiple_agents':
     agents = [
-        # Random_Agent(**config),
+        Random_Agent(**config),
         EpsGreedy(**config),
         EpsGreedy_SampleAverage(**config),
-        # OptimisticGreedy(**config),
-        # Gradient_Bandit(**config),
-        # UCB(**config)
+        OptimisticGreedy(**config),
+        Gradient_Bandit(**config),
+        UCB(**config)
     ]
     perfs, best_actions = run_multiple_agents(agents, kbandit=kbandit,
                                               n_runs=n_runs,
                                               max_steps=max_steps)
     # You can change the labels, title and file_name
-    labels = ['EpsGreedy', 'EpsGreedySA']
+    labels = ['Random', 'EpsGreedy', 'EpsGreedySA', 'Optimistic', 'Gradient',
+              'UCB']
     file_name = 'plots/agent_comparison'
     suptitle = 'Agent comparison on k-armed-Bandit'
 

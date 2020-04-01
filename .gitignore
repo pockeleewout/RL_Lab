@@ -131,3 +131,12 @@ dmypy.json
 #macos temporary files
 .DS_Store/
 .DS_Store
+
+
+# LaTeX files
+*.aux
+*.bcf
+*.out
+*.pdf
+*.run.xml
+*.toc

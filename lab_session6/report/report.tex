@@ -111,6 +111,11 @@
 
 					When we take $c$ to be very large, for example $c = 69^{42}$, then the agent will, for a very long time, pick almost randomly.
 				\item [$\boldsymbol{\alpha}$]
+					This parameter influences the rate of change for the preferences.
+
+					If this value where to be really large, say $\alpha = 10^{69}$, then the agent might get stuck on the first (few) bandits, since a single reward above baseline will increase their reward immensely.
+
+					On the other hand, a really low reward like $\alpha = 32^{-42}$ will cause the agent to be very slow at learning from the different rewards.
 			\end{description}
 
 		\question{5}{Show that the Sample Average method erases the bias introduced by the initialization of the $Q$ estimates. 
@@ -124,7 +129,7 @@
 			\begin{figure}[H]
 				\centering
 				% Change the plot name here:
-				\includegraphics[width=8cm]{plots/your_plot_here.png}
+				\includegraphics[width=8cm]{plots/agent_comparison_perf}
 				\caption{Comparison: $\epsilon$-greedy algorithm with Sample Average versus Weighted Average updates.}
 				\label{fig:sa_vs_wa}
 			\end{figure}{}

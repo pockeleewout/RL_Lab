@@ -78,13 +78,58 @@ class Random_Agent(Bandit_Agent):
         return np.random.randint(self.k)
 
 
-class EpsGreedy_SampleAverage:
+class EpsGreedy_SampleAverage(Bandit_Agent):
     # TODO: implement this class following the formalism above.
     # This class uses Sample Averages to estimate q; others are non stationary.
-    pass
+
+    def __init__(self, eps: float, **kwargs):
+        super().__init__(**kwargs)
+        self.q = np.zeros(self.k)
+        self.eps = float(eps)
+        self.steps = np.zeros(self.k)
+
+    def reset(self):
+        self.q = np.zeros(self.k)
+        self.steps = np.zeros(self.k)
+
+    def learn(self, a: int, r: float):
+        self.q[a] += (r - self.q[a]) / self.steps[a]
+
+    def act(self) -> int:
+        if np.random.random() > self.eps:
+            # Select best option
+            act = max(enumerate(self.q), key=lambda q: q[1])[0]
+        else:
+            # Select random
+            act = np.random.randint(self.k)
+        self.steps[act] += 1
+        return act
 
 
-class EpsGreedy_WeightedAverage:
+class EpsGreedy_WeightedAverage(Bandit_Agent):
     # TODO: implement this class following the formalism above.
     # Non stationary agent with q estimating and eps-greedy action selection.
-    pass
+
+    def __init__(self, alpha: float, eps: float, **kwargs):
+        super().__init__(**kwargs)
+        self.q = np.zeros(self.k)
+        self.alpha = float(alpha)
+        self.steps = np.zeros(self.k)
+        self.eps = float(eps)
+
+    def reset(self):
+        self.q = np.zeros(self.k)
+        self.steps = np.zeros(self.k)
+
+    def learn(self, a: int, r: float):
+        self.q[a] = self.q[a] + self.alpha * (r - self.q[a])
+
+    def act(self) -> int:
+        if np.random.random() > self.eps:
+            # Select best option
+            act = max(enumerate(self.q), key=lambda q: q[1])[0]
+        else:
+            # Select random
+            act = np.random.randint(self.k)
+        self.steps[act] += 1
+        return act

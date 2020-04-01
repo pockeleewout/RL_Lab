@@ -9,8 +9,10 @@ from utils import *
 from agents import *
 from bandit import *
 
-## FUNCTIONS ===================================================================
 
+# FUNCTIONS ===================================================================
+
+# noinspection PyShadowingNames
 def run_bandit(agent, kbandit, max_steps) -> (np.array, np.array):
     """
     Runs a Bandit problem once. The kbandit and agent are reinitializated,
@@ -48,6 +50,8 @@ def run_bandit(agent, kbandit, max_steps) -> (np.array, np.array):
 
     return perf, best_action
 
+
+# noinspection PyShadowingNames
 def run_multiple_bandits(n_runs, **kwargs) -> (np.array, np.array):
     """
     Runs multiple independent bandit problems; outputs the mean of the results.
@@ -65,13 +69,23 @@ def run_multiple_bandits(n_runs, **kwargs) -> (np.array, np.array):
     """
     perfs = []
     best_actions = []
+
+    import multiprocessing
+    pool = multiprocessing.Pool(8)
+    results = []
+
     for run in range(n_runs):
-        perf, best_action = run_bandit(**kwargs)
+        results.append(pool.apply_async(run_bandit, kwds=kwargs))
+    for run in range(n_runs):
+        print(run)
+        perf, best_action = results[run].get()
         perfs.append(perf)
         best_actions.append(best_action)
 
-    return np.mean(perfs,axis=0), np.mean(best_actions,axis=0)
+    return np.mean(perfs, axis=0), np.mean(best_actions, axis=0)
 
+
+# noinspection PyShadowingNames
 def run_multiple_agents(agents, **kwargs):
     """
     Launches run_multiple_bandits for a list of agents.
@@ -99,6 +113,8 @@ def run_multiple_agents(agents, **kwargs):
 
     return perfs, best_actions
 
+
+# noinspection PyShadowingNames
 def run_spectrum(spectrum, **kwargs):
     """
     Launches run_multiple_bandits for a spectrum of hyperparameters specified
@@ -132,7 +148,8 @@ def run_spectrum(spectrum, **kwargs):
 
     return np.array(perfs), np.array(best_actions)
 
-## HYPERPARAMETERS =============================================================
+
+# HYPERPARAMETERS =============================================================
 config = {
     'k': 10,
     'lr': 0.1,
@@ -143,14 +160,14 @@ config = {
 }
 
 n_runs = 2000
-max_steps = 1000
+max_steps = 10000
 
-## RUNNING =====================================================================
-kbandit = KBandit(**config)
+# RUNNING =====================================================================
+kbandit = KBandit_NonStat(**config)
 
 # Un-comment the one you want to use.
 launch_type = 'multiple_agents'
-#launch_type = 'spectrum'
+# launch_type = 'spectrum'
 
 if launch_type == 'multiple_agents':
     agents = [
@@ -158,7 +175,9 @@ if launch_type == 'multiple_agents':
         EpsGreedy_WeightedAverage(**config),
         EpsGreedy_SampleAverage(**config),
     ]
-    perfs, best_actions = run_multiple_agents(agents, kbandit=kbandit, n_runs=n_runs, max_steps=max_steps)
+    perfs, best_actions = run_multiple_agents(agents, kbandit=kbandit,
+                                              n_runs=n_runs,
+                                              max_steps=max_steps)
     # You can change the labels, title and file_name
     labels = ['Random', 'EpsGreedyWA', 'EpsGreedySA']
     file_name = 'plots/agent_comparison'
@@ -166,17 +185,18 @@ if launch_type == 'multiple_agents':
 
 elif launch_type == 'spectrum':
     agent = UCB(**config)
-    spectrum =  ['c', [0.25,0.5,1,2]]
+    spectrum = ['c', [0.25, 0.5, 1, 2]]
     # finally, running:
-    perfs, best_actions = run_spectrum(spectrum, agent=agent, kbandit=kbandit, n_runs=n_runs, max_steps=max_steps)
+    perfs, best_actions = run_spectrum(spectrum, agent=agent, kbandit=kbandit,
+                                       n_runs=n_runs, max_steps=max_steps)
     # You can change the labels, title and file_name
     labels = ['{}={}'.format(spectrum[0], value) for value in spectrum[1]]
     file_name = 'plots/{}_study'.format(spectrum[0])
-    suptitle = 'Varying {} for {} on k-armed-Bandit'.format(spectrum[0], agent.__class__.__name__)
+    suptitle = 'Varying {} for {} on k-armed-Bandit'.format(spectrum[0],
+                                                            agent.__class__.__name__)
 
-
-## PLOTTING ====================================================================
+# PLOTTING ====================================================================
 title = dict_string(config)
 
-action_plot (best_actions, file_name+'_action', suptitle, title, labels)
-perf_plot   (perfs, file_name+'_perf', suptitle, title, labels)
+action_plot(best_actions, file_name + '_action', suptitle, title, labels)
+perf_plot(perfs, file_name + '_perf', suptitle, title, labels)

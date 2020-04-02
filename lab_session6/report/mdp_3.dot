@@ -1,0 +1,149 @@
+digraph {
+	rankdir="LR";
+	ranksep=1;
+
+	subgraph {
+//		rank="same";
+		park_low [label=<P<SUB>l</SUB>>, fontsize=12, shape=square];
+		park_med [label=<P<SUB>m</SUB>>, fontsize=12, shape=square];
+		park_hig [label=<P<SUB>h</SUB>>, fontsize=12, shape=square];
+	}
+
+	subgraph {
+//		rank="same";
+		cemetery_low [label=<C<SUB>l</SUB>>, fontsize=12, shape=square];
+		cemetery_med [label=<C<SUB>m</SUB>>, fontsize=12, shape=square];
+		cemetery_hig [label=<C<SUB>h</SUB>>, fontsize=12, shape=square];
+	}
+
+	subgraph {
+//		rank="same";
+		university_low [label=<U<sub>l</sub>>, fontsize=12, shape=square];
+		university_med [label=<U<sub>m</sub>>, fontsize=12, shape=square];
+		university_hig [label=<U<sub>h</sub>>, fontsize=12, shape=square];
+	}
+
+	subgraph {
+//		rank="same";
+		park_low_c [label=c, fontsize=9, shape=circle, color=blue, fontcolor=blue];
+		park_med_c [label=c, fontsize=9, shape=circle, color=coral, fontcolor=coral];
+		park_hig_c [label=c, fontsize=9, shape=circle, color=forestgreen, fontcolor=forestgreen];
+	}
+	park_low_p [label=p, fontsize=9, shape=circle];
+	park_med_p [label=p, fontsize=9, shape=circle];
+	park_hig_p [label=p, fontsize=9, shape=circle];
+
+	subgraph {
+//		rank="same";
+		cemetery_low_c [label=c, fontsize=9, shape=circle, color=blue, fontcolor=blue];
+		cemetery_med_c [label=c, fontsize=9, shape=circle, color=coral, fontcolor=coral];
+		cemetery_hig_c [label=c, fontsize=9, shape=circle, color=forestgreen, fontcolor=forestgreen];
+	}
+	cemetery_low_p [label=p, fontsize=9, shape=circle];
+	cemetery_med_p [label=p, fontsize=9, shape=circle];
+	cemetery_hig_p [label=p, fontsize=9, shape=circle];
+
+	university_low_p [label=p, fontsize=9, shape=circle];
+	university_med_p [label=p, fontsize=9, shape=circle];
+	university_hig_p [label=p, fontsize=9, shape=circle];
+
+	subgraph cluster_low {
+		rank="same";
+		label=Low;
+		park_low;
+		park_low_c;
+		cemetery_low;
+		cemetery_low_c;
+		university_low;
+	}
+	subgraph cluster_med {
+		rank="same";
+		label=Medium
+		park_med;
+		park_med_c;
+		cemetery_med;
+		cemetery_med_c;
+		university_med;
+	}
+	subgraph cluster_hig {
+		rank="same";
+		label=High;
+		park_hig;
+		park_hig_c;
+		cemetery_hig;
+		cemetery_hig_c;
+		university_hig;
+	}
+
+	parked [label=Parked, fontsize=12, shape=square];
+
+	// Transitions
+
+	park_low -> park_low_c;
+	park_low_c -> park_low [label="p=0.1; -1", color=blue, fontcolor=blue];
+	park_low_c -> park_med [label="p=0.1; -1", color=blue, fontcolor=blue];
+	park_low_c -> park_hig [label="p=0.1; -1", color=blue, fontcolor=blue];
+	park_low_c -> cemetery_low [label="p=0.2; -1", color=blue, fontcolor=blue];
+	park_low_c -> cemetery_med [label="p=0.3; -1", color=blue, fontcolor=blue];
+	park_low_c -> cemetery_hig [label="p=0.2; -1", color=blue, fontcolor=blue];
+
+	park_low -> park_low_p;
+	park_low_p -> parked [label=10];
+
+	park_med -> park_med_c;
+	park_med_c -> park_low [label="p=0.1; -1", color=coral, fontcolor=coral];
+	park_med_c -> park_med [label="p=0.1; -1", color=coral, fontcolor=coral];
+	park_med_c -> park_hig [label="p=0.1; -1", color=coral, fontcolor=coral];
+	park_med_c -> cemetery_med [label="p=0.4; -1", color=coral, fontcolor=coral];
+	park_med_c -> cemetery_hig [label="p=0.3; -1", color=coral, fontcolor=coral];
+
+	park_med -> park_med_p;
+	park_med_p -> parked[label=10];
+
+	park_hig -> park_hig_c;
+	park_hig_c -> park_low [label="p=0.2; -1", color=forestgreen, fontcolor=forestgreen];
+	park_hig_c -> park_med [label="p=0.2; -1", color=forestgreen, fontcolor=forestgreen];
+	park_hig_c -> park_hig [label="p=0.2; -1", color=forestgreen, fontcolor=forestgreen];
+	park_hig_c -> cemetery_hig [label="p=0.4; -1", color=forestgreen, fontcolor=forestgreen];
+
+	park_hig -> park_hig_p;
+	park_hig_p -> parked [label=10];
+
+	cemetery_low -> cemetery_low_c;
+	cemetery_low_c -> cemetery_low [label="p=0.1; -1", color=blue, fontcolor=blue];
+	cemetery_low_c -> cemetery_med [label="p=0.1; -1", color=blue, fontcolor=blue];
+	cemetery_low_c -> cemetery_hig [label="p=0.1; -1", color=blue, fontcolor=blue];
+	cemetery_low_c -> university_low [label="p=0.2; -1", color=blue, fontcolor=blue];
+	cemetery_low_c -> university_med [label="p=0.3; -1", color=blue, fontcolor=blue];
+	cemetery_low_c -> university_hig [label="p=0.2; -1", color=blue, fontcolor=blue];
+
+	cemetery_low -> cemetery_low_p;
+	cemetery_low_p -> parked [label=50];
+
+	cemetery_med -> cemetery_med_c;
+	cemetery_med_c -> cemetery_low [label="p=0.1; -1", color=coral, fontcolor=coral];
+	cemetery_med_c -> cemetery_med [label="p=0.1; -1", color=coral, fontcolor=coral];
+	cemetery_med_c -> cemetery_hig [label="p=0.1; -1", color=coral, fontcolor=coral];
+	cemetery_med_c -> university_med [label="p=0.4; -1", color=coral, fontcolor=coral];
+	cemetery_med_c -> university_hig [label="p=0.3; -1", color=coral, fontcolor=coral];
+
+	cemetery_med -> cemetery_med_p;
+	cemetery_med_p -> parked [label=50];
+
+	cemetery_hig -> cemetery_hig_c;
+	cemetery_hig_c -> cemetery_low [label="p=0.2; -1", color=forestgreen, fontcolor=forestgreen];
+	cemetery_hig_c -> cemetery_med [label="p=0.2; -1", color=forestgreen, fontcolor=forestgreen];
+	cemetery_hig_c -> cemetery_hig [label="p=0.2; -1", color=forestgreen, fontcolor=forestgreen];
+	cemetery_hig_c -> university_hig [label="p=0.4; -1", color=forestgreen, fontcolor=forestgreen];
+
+	cemetery_hig -> cemetery_hig_p;
+	cemetery_hig_p -> parked [label=50];
+
+	university_low -> university_low_p;
+	university_low_p -> parked [label=100];
+	university_med -> university_med_p;
+	university_med_p -> parked [label=100];
+	university_hig -> university_hig_p;
+	university_hig_p -> parked [label=100];
+
+}

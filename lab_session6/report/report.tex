@@ -125,7 +125,9 @@
 		\programming{Implement a Sample Average and Weighted Average version of $\epsilon$ greedy on a Non-Stationary k-armed Bandit problem. 
 				In order to see results, run the experiment for $10k$ steps, and paste here the resulting performance plot in the Figure \ref{fig:sa_vs_wa} below. 
 				Explain your results below.}
-			(your explanation here)
+			When running the simulation for 10000 runs, we see that the Sample Average agent performs slightly better than the Weighted Average agent, which is unexpected.
+			Since this is a stochastic simulation, and I only ran 10000 runs for each agent, it could be that this result is not representative for the general case.
+
 			\begin{figure}[H]
 				\centering
 				% Change the plot name here:
@@ -145,7 +147,8 @@
 		\end{itemize}{}
 
 		\question{1}{Define a Markov Decision Process, and the goal of the Reinforcement Learning problem.}
-			(your answer here)
+			A Markov Decision Process is a Markov process with external inputs to drive state transitions that have a stochastic outcome.
+			The goal of using these processes is to maximize the long-term reward of an AI agent.
 
 		\question{2}{Show that the MDP framework generalizes over Bandits by drawing the Bandits problem as a MDP with reward distributions $r_a$ for each action $a$. 
 				Paste your drawing on Figure \ref{fig:bandit_mdp}. 
@@ -154,11 +157,14 @@
 			\begin{figure}[H]
 				\centering
 				% Change the plot name here:
-				\includegraphics[width=8cm]{plots/your_plot_here.png}
+				\includegraphics[width=8cm]{plots/IMG_0257}
 				\caption{The MDP corresponding to the Bandit problem with reward distributions $r_a$, $\forall$ actions $a$}.
 				\label{fig:bandit_mdp}
 			\end{figure}{}
-			(your explanation here)
+			When the agent chooses a bandit $a_i$, it will receive a reward from the distribution $r_{a_i}$.
+			For a multi-armed bandit this can be modelled by defining multiple actions with different reward distributions.
+			If you want to do non-stationary distributions, you have to discretize the stochastic distributions used for the variation.
+			Then one introduces a state for every possible combination of reward distributions for the different bandits in the multi-armed bandit.
 
 
 		\question{3}{Turn the following statement into a MDP, with states and transitions with actions (named), probabilities and rewards. 
@@ -177,16 +183,35 @@
 			\begin{figure}[H]
 				\centering
 				% Change the plot name here:
-				\includegraphics[width=8cm]{plots/your_plot_here.png}
+				\includegraphics[width=8cm]{plots/mdp_3}
 				\caption{The MDP corresponding to the statement of Question 3}.
 				\label{fig:q3}
 			\end{figure}{}
-			(your explanation here)
+
+			We have 9 main states, and a ``Parked'' end-state. We have 3 states for each location; the $P$ park-states, the $C$ cemetery-states and the $U$ university-states.
+			Each have a low ($P_l, C_l, U_l$), medium ($P_m, C_m, U_m$) and high ($P_h, C_h, U_h$) occupancy rate.
+			We have 2 possible actions: continue ($c$) or park($p$).
+
+			When we continue to the next stop, there is a chance the stop is completely full, and we automatically return to the previous state.
+			There is no sense in continuing to the next stop, since the occupancy rate is either the same or higher, which automatically means it is also full.
+			When we move, there is a negative reward for losing time.
+
+			When we decide to park, there is always a space available, and thus we have a $100\%$ chance of parking and gaining the reward.
 
 		\question{4}{RL has been widely popular lately because of its combination with Deep Learning (using Neural Nets as policy or value function approximators), leading to incredible performances on difficult environments like video games. 
 				One such game is the first Mario World. 
 				Show how the MDP can look like for the frames of the game. 
 				Where can stochasticity be involved?}
+			Since encoding a game state into an MDP would take too much space to visualize, I decided to keep this a mental exercise.
+
+			To encode the frames of the Super Mario video game, one could start by taking a number ``beams'', originating from the player character and having evenly spaced angles between them.
+			One could take the distances along these beams from the player character to the nearest object, and encode them into the states of the MDP.
+			Also encoded into the state could be the types of objects colliding with the beams.
+
+			Some game-specific optimizations could be to take into account hardware limitations, from which we know how many enemies can be on-screen at once.
+			You could then encode the positions and types of all the enemies on the screen into the state.
+
+			The stochasticity comes into play when we transition between states, since an enemy could take a multitide of actions.
 
 
 	\section{Control}
@@ -209,9 +234,19 @@
 
 		\question{1}{Discuss and compare the performances of both algorithms. 
 				Under what circumstances can one come on top of the other?}
+			When comparing Value Iteration and Policy iteration, one has to keep in mind that they both compute the same thing, but do so in slightly different ways.
+
+			Value Iteration is, in the general case, slower than Policy iteration.
+			This stems from the fact that during value iteration we evaluate all the actions in every state, thus we have a complexity of $O(|S| * |A|)$ for each iteration on $V$.
+			On the other hand, Policy Iteration has a complexity of $O(|S|)$ for each iteration on $V_{\pi}$, and a complexity of $O(|A|)$ for each iteration on $\pi$.
+
+			When the system the algorithm is being used on has a lot of actions, then Policy iteration has a clear advantage.
+			In the situation an MDP has a lot of states and very few actions, I theorise there could be an advantage for Value Iteration, since it will evaluate all actions at once, and not in turn like Policy Iteration.
 
 		\question{3}{Explain the fundamental differences between QLearning and the Value Iteration / Policy Iteration algorithms. 
 				Can you see why QLearning is more interesting in the general case?}
+			The fundamental difference between Value-/Policy- Iteration and Q-Learning is that Value- and Policy- Iteration are offline algorithms, and Q-Learning is an online algorithm.
+			Another fundamental difference is that Q-Learning does not try to learn the value of each state, but the q-values of each action directly.
 
 	\section{Bonus}
 		\programming{\textbf{BONUS, 1.5pts} Implement the Gridworld drawn on Figure \ref{fig:river_crossing}: a river crossing. 

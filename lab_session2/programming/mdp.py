@@ -13,29 +13,31 @@
 
 
 import random
+from typing import *
+
 
 class MarkovDecisionProcess:
 
-    def getStates(self):
+    def getStates(self) -> List[Tuple[int, int]]:
         """
         Return a list of all states in the MDP.
         Not generally possible for large MDPs.
         """
-        abstract
+        raise NotImplementedError()
 
-    def getStartState(self):
+    def getStartState(self) -> Tuple[int, int]:
         """
         Return the start state of the MDP.
         """
-        abstract
+        raise NotImplementedError()
 
-    def getPossibleActions(self, state):
+    def getPossibleActions(self, state) -> Tuple[str]:
         """
         Return list of possible actions from 'state'.
         """
-        abstract
+        raise NotImplementedError()
 
-    def getTransitionStatesAndProbs(self, state, action):
+    def getTransitionStatesAndProbs(self, state, action) -> List[Tuple[Tuple[int, int], float]]:
         """
         Returns list of (nextState, prob) pairs
         representing the states reachable
@@ -46,17 +48,17 @@ class MarkovDecisionProcess:
         learning in general, we do not know these
         probabilities nor do we directly model them.
         """
-        abstract
+        raise NotImplementedError()
 
-    def getReward(self, state, action, nextState):
+    def getReward(self, state, action, nextState) -> Union[int, float]:
         """
         Get the reward for the state, action, nextState transition.
 
         Not available in reinforcement learning.
         """
-        abstract
+        raise NotImplementedError()
 
-    def isTerminal(self, state):
+    def isTerminal(self, state) -> bool:
         """
         Returns true if the current state is a terminal state.  By convention,
         a terminal state has zero future rewards.  Sometimes the terminal state(s)
@@ -64,4 +66,4 @@ class MarkovDecisionProcess:
         state as having a self-loop action 'pass' with zero reward; the formulations
         are equivalent.
         """
-        abstract
+        raise NotImplementedError()

@@ -2,6 +2,8 @@
 
 \usepackage{hyperref}
 \usepackage{graphicx}
+\usepackage{pdflscape}
+\usepackage{pdfpages}
 
 
 \title{Distributed Artificial Intelligence \\ \large{Report Assignment 5/Lab 8}}
@@ -49,21 +51,29 @@
   \texttt{N\_TRIALS} was set to $1$ and the variable \texttt{REWARD\_THRESHOLD}
   was set to $100$.
 
-  \begin{figure}[h]
-   \centering
-   \includegraphics[width=\textwidth, angle=90]{LunarLander-A2C-train}
-   \caption{The reward, policy loss and value loss plots from training the A2C
-            agent on the \texttt{LunarLander-v2} environment.}
-   \label{ref:lunar-a2c-train}
-  \end{figure}
+  To tune the parameter \texttt{MAX\_EPISODES}, I first ran the notebook
+  without modifying the default value of $500$.  This was enough for the A2C
+  agent, which reached the defined threshold in 152 episodes.  The PPO agent
+  required significantly more time, taking 2715 episodes to reach the threshold.
+  Both these results can be found in \autoref{sec:lunar-notebook}.
 
-  \begin{figure}[h]
-   \centering
-   \includegraphics[width=\textwidth, angle=90]{LunarLander-PPO-train}
-   \caption{The reward, policy loss and value loss plots from training the PPO
-            agent on the \texttt{LunarLander-v2} environment.}
-   \label{fig:lunar-ppo-train}
-  \end{figure}
+  \begin{landscape}
+   \begin{figure}
+    \centering
+    \includegraphics[height=0.41\textheight]{LunarLander-A2C-train}
+    \caption{The reward, policy loss and value loss plots from training the A2C
+             agent on the \texttt{LunarLander-v2} environment.}
+    \label{ref:lunar-a2c-train}
+   \end{figure}
+ 
+   \begin{figure}
+    \centering
+    \includegraphics[height=0.41\textheight]{LunarLander-PPO-train}
+    \caption{The reward, policy loss and value loss plots from training the PPO
+             agent on the \texttt{LunarLander-v2} environment.}
+    \label{fig:lunar-ppo-train}
+   \end{figure}
+  \end{landscape}
 
  \section[Performance comparison of A2C and PPO]{Performance comparison of 
    Advantage Actor Critic and Proximal Policy Optimization}
@@ -99,5 +109,19 @@
   \bibitem{gym}
    OpenAI, ``Gym'', \textit{gym.openai.com}. [Online]. Available: \url{gym.openai.com}. [Accessed: May 1, 2020].
  \end{thebibliography}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+ \appendix
+
+ \section{Jupyter Notebook for the \texttt{CartPole-v1} environment}
+ \label{sec:cartpole-notebook}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ \includepdf[pages=-]{CartPole/A2C_PPO.pdf}
+
+ \section{Jupter Notebook for the \texttt{LunarLander-v2} environment}
+ \label{sec:lunar-notebook}
+ %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ \includepdf[pages=-]{LunarLander/A2C_PPO.pdf}
 
 \end{document}
